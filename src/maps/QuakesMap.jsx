@@ -58,7 +58,7 @@ function Popup({ properties, geometry }) {
   );
 }
 
-function Map() {
+export default function Map() {
   const [quakesJson, setQuakesJson] = useState([]);
   const [minMag, setMinMag] = useState("2.5");
   const [timespan, setTimespan] = useState("week");
@@ -79,14 +79,19 @@ function Map() {
   useEffect(() => {
     const url = `${BASE_URL}/${minMag}_${timespan}.geojson`;
     fetchQuakeData(url);
-  }, []);
+  }, [minMag, timespan]);
 
   // console.log(quakesJson);
 
   return (
     <>
       <CssBaseline />
-      <Header />
+      <Header
+        minMag={minMag} // Nach dem Import von Header.jsx kann der Return mit den Komponeten der Funktion in Header.jsx ausgeben werden. Unter anderem werden die Werte von setMagnitude aus Header.jsx an setMagnitude in QuakesMap.jsx übergeben.
+        setMinMag={setMinMag}
+        timespan={timespan}
+        setTimespan={setTimespan}
+      />
       <MapContainer
         style={{ height: "100vh" }}
         center={[0, 0]}
@@ -96,13 +101,16 @@ function Map() {
         maxBoundsViscosity={1}
       >
         <LayersControl position="topright">
-          {BASE_LAYERS.map(baseLayer => (
+          {BASE_LAYERS.map((baseLayer) => (
             <LayersControl.BaseLayer
               key={baseLayer.url}
               checked={baseLayer.checked}
               name={baseLayer.name}
             >
-              <TileLayer attribution={baseLayer.attribution} url={baseLayer.url} />
+              <TileLayer
+                attribution={baseLayer.attribution}
+                url={baseLayer.url}
+              />
             </LayersControl.BaseLayer>
           ))}
 
@@ -119,5 +127,3 @@ function Map() {
     </>
   );
 }
-
-export default Map;
